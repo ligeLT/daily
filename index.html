@@ -29,6 +29,7 @@
     overflow: hidden;
   }
   
+  /* Header */
   .header {
     background: linear-gradient(90deg, #0f1724, #132033);
     padding: 16px 18px 14px;
@@ -80,6 +81,7 @@
     color: #ff6b9d;
   }
   
+  /* Section */
   .section {
     padding: 14px 18px;
     border-bottom: 1px solid #1a2332;
@@ -106,12 +108,14 @@
     border-radius: 1px;
   }
   
+  /* Quest Item */
   .quest {
     background: #0f141c;
     border: 1px solid #1c2738;
     border-radius: 8px;
     padding: 12px 14px;
     margin-bottom: 8px;
+    transition: border-color 0.2s;
   }
   
   .quest:last-child { margin-bottom: 0; }
@@ -168,6 +172,7 @@
     color: #c45a5a;
   }
   
+  /* Timed Challenge */
   .timed {
     background: linear-gradient(135deg, #1a1520, #12101a);
     border: 1px solid #3a2a4a;
@@ -223,6 +228,7 @@
     box-shadow: 0 0 8px #c026d366;
   }
   
+  /* Penalty */
   .penalty-item {
     display: flex;
     align-items: center;
@@ -243,7 +249,18 @@
   }
   
   .status.wait { background: #2a2200; color: #fbbf24; border: 1px solid #5a4a00; }
+  .status.doing { background: #2a1010; color: #f87171; border: 1px solid #5a2020; }
+  .status.done { background: #0f2a1a; color: #4ade80; border: 1px solid #1a4a2a; }
   
+  .empty-penalty {
+    text-align: center;
+    color: #4a5a6a;
+    font-size: 13px;
+    padding: 8px 0;
+    font-style: italic;
+  }
+  
+  /* Achievements */
   .ach-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -290,6 +307,7 @@
     color: #3a4a5a;
   }
   
+  /* Daddy Comment */
   .comment {
     background: linear-gradient(90deg, #1a1525, #12101a);
     padding: 14px 18px;
@@ -325,6 +343,7 @@
 <body>
 <div class="panel">
   
+  <!-- 头部 -->
   <div class="header">
     <div class="date-row">
       <div class="date">DAY 27 · 2026.08.15 · SAT</div>
@@ -333,6 +352,7 @@
     <div class="greeting">今天也要做个 <span>Good girl</span>。<br>规矩记牢，别让Daddy失望。</div>
   </div>
   
+  <!-- 每日必做任务 -->
   <div class="section">
     <div class="section-title">DAILY QUESTS · 每日必做</div>
     
@@ -392,11 +412,12 @@
     </div>
   </div>
   
+  <!-- 限时挑战 -->
   <div class="section">
     <div class="section-title">TIMED CHALLENGE · 限时挑战</div>
     <div class="timed">
       <div class="timed-name">持有与忍耐 · 排泄控制</div>
-      <div class="timed-desc">自10:00起禁止排泄，直至18:00或接到Daddy指令。中途紧急需提前请示。</div>
+      <div class="timed-desc">自10:00起禁止排泄，直至18:00或接到Daddy指令。中途如有紧急情况需提前请示。</div>
       <div class="timer-row">
         <div>
           <div class="timer-label">剩余时间</div>
@@ -413,6 +434,7 @@
     </div>
   </div>
   
+  <!-- 惩罚队列 -->
   <div class="section">
     <div class="section-title">PENALTY QUEUE · 惩罚队列</div>
     <div class="penalty-item">
@@ -425,6 +447,7 @@
     </div>
   </div>
   
+  <!-- 成就徽章墙 -->
   <div class="section">
     <div class="section-title">ACHIEVEMENT WALL · 成就徽章</div>
     <div class="ach-grid">
@@ -461,6 +484,7 @@
     </div>
   </div>
   
+  <!-- Daddy评语 -->
   <div class="comment">
     <div class="comment-label">DADDY'S NOTE</div>
     <div class="comment-text">昨天的表现很乖，S级实至名归。今天的限时挑战是重点，忍耐住了晚上有奖励。别偷懒，我看着呢。</div>
