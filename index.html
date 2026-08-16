@@ -6,9 +6,9 @@
 <title>Daily Quest Panel</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
-  
+  
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  
+  
   body {
     background: #0a0c12;
     display: flex;
@@ -18,7 +18,7 @@
     color: #e0e6f0;
     min-height: 100vh;
   }
-  
+  
   .panel {
     width: 100%;
     max-width: 440px;
@@ -28,15 +28,14 @@
     box-shadow: 0 0 40px rgba(0, 200, 255, 0.08), inset 0 1px 0 rgba(255,255,255,0.05);
     overflow: hidden;
   }
-  
-  /* Header */
+  
   .header {
     background: linear-gradient(90deg, #0f1724, #132033);
     padding: 16px 18px 14px;
     border-bottom: 1px solid #1e2a3a;
     position: relative;
   }
-  
+  
   .header::after {
     content: '';
     position: absolute;
@@ -44,21 +43,21 @@
     height: 2px;
     background: linear-gradient(90deg, transparent, #00d4ff44, transparent);
   }
-  
+  
   .date-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 8px;
   }
-  
+  
   .date {
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
     color: #7a8ba3;
     letter-spacing: 0.5px;
   }
-  
+  
   .score {
     font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
@@ -69,24 +68,23 @@
     border-radius: 4px;
     border: 1px solid #5a4a00;
   }
-  
+  
   .greeting {
     font-size: 15px;
     font-weight: 500;
     color: #f0f4ff;
     line-height: 1.4;
   }
-  
+  
   .greeting span {
     color: #ff6b9d;
   }
-  
-  /* Section */
+  
   .section {
     padding: 14px 18px;
     border-bottom: 1px solid #1a2332;
   }
-  
+  
   .section-title {
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
@@ -99,7 +97,7 @@
     align-items: center;
     gap: 6px;
   }
-  
+  
   .section-title::before {
     content: '';
     width: 3px;
@@ -107,30 +105,28 @@
     background: #00d4ff;
     border-radius: 1px;
   }
-  
-  /* Quest Item */
+  
   .quest {
     background: #0f141c;
     border: 1px solid #1c2738;
     border-radius: 8px;
     padding: 12px 14px;
     margin-bottom: 8px;
-    transition: border-color 0.2s;
   }
-  
+  
   .quest:last-child { margin-bottom: 0; }
-  
+  
   .quest.done {
     border-color: #1a3a2a;
     opacity: 0.75;
   }
-  
+  
   .quest-top {
     display: flex;
     align-items: flex-start;
     gap: 10px;
   }
-  
+  
   .checkbox {
     font-family: 'JetBrains Mono', monospace;
     font-size: 16px;
@@ -138,68 +134,67 @@
     line-height: 1.2;
     flex-shrink: 0;
   }
-  
+  
   .quest.done .checkbox { color: #22c55e; }
-  
+  
   .quest-info { flex: 1; }
-  
+  
   .quest-name {
     font-size: 14px;
     font-weight: 600;
     color: #e8eef8;
     margin-bottom: 3px;
   }
-  
+  
   .quest.done .quest-name {
     text-decoration: line-through;
     color: #6a7a8a;
   }
-  
+  
   .quest-desc {
     font-size: 12px;
     color: #8a9ab0;
     line-height: 1.45;
     margin-bottom: 6px;
   }
-  
+  
   .quest-reward {
     font-size: 11px;
     color: #5a9a6a;
     font-family: 'JetBrains Mono', monospace;
   }
-  
+  
   .quest-reward.punish {
     color: #c45a5a;
   }
-  
-  /* Timed Challenge */
+  
   .timed {
     background: linear-gradient(135deg, #1a1520, #12101a);
     border: 1px solid #3a2a4a;
     border-radius: 8px;
     padding: 14px;
   }
-  
+  
   .timed-name {
     font-size: 14px;
     font-weight: 600;
     color: #e8b4ff;
     margin-bottom: 4px;
   }
-  
+  
   .timed-desc {
     font-size: 12px;
     color: #a08ab8;
     margin-bottom: 10px;
   }
-  
+  
   .timer-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 8px;
   }
-  
+  
   .timer {
     font-family: 'JetBrains Mono', monospace;
     font-size: 18px;
@@ -207,19 +202,19 @@
     color: #ff6b9d;
     letter-spacing: 1px;
   }
-  
+  
   .timer-label {
     font-size: 11px;
     color: #7a6a8a;
   }
-  
+  
   .progress-bar {
     height: 6px;
     background: #1a1525;
     border-radius: 3px;
     overflow: hidden;
   }
-  
+  
   .progress-fill {
     height: 100%;
     width: 62%;
@@ -227,8 +222,7 @@
     border-radius: 3px;
     box-shadow: 0 0 8px #c026d366;
   }
-  
-  /* Penalty */
+  
   .penalty-item {
     display: flex;
     align-items: center;
@@ -237,9 +231,9 @@
     border-bottom: 1px dashed #1e2a3a;
     font-size: 13px;
   }
-  
+  
   .penalty-item:last-child { border-bottom: none; }
-  
+  
   .status {
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
@@ -247,26 +241,15 @@
     border-radius: 3px;
     flex-shrink: 0;
   }
-  
+  
   .status.wait { background: #2a2200; color: #fbbf24; border: 1px solid #5a4a00; }
-  .status.doing { background: #2a1010; color: #f87171; border: 1px solid #5a2020; }
-  .status.done { background: #0f2a1a; color: #4ade80; border: 1px solid #1a4a2a; }
-  
-  .empty-penalty {
-    text-align: center;
-    color: #4a5a6a;
-    font-size: 13px;
-    padding: 8px 0;
-    font-style: italic;
-  }
-  
-  /* Achievements */
+  
   .ach-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
   }
-  
+  
   .ach {
     background: #0f141c;
     border: 1px solid #2a3a1a;
@@ -274,46 +257,45 @@
     padding: 10px;
     font-size: 12px;
   }
-  
+  
   .ach.locked {
     border-color: #1e2a3a;
     opacity: 0.7;
   }
-  
+  
   .ach-icon {
     font-size: 16px;
     margin-bottom: 4px;
   }
-  
+  
   .ach-name {
     font-weight: 600;
     color: #ffd700;
     margin-bottom: 2px;
     font-size: 12px;
   }
-  
+  
   .ach.locked .ach-name {
     color: #5a6a7a;
   }
-  
+  
   .ach-cond {
     font-size: 11px;
     color: #7a8a9a;
     line-height: 1.3;
   }
-  
+  
   .ach.hidden .ach-name {
     letter-spacing: 2px;
     color: #3a4a5a;
   }
-  
-  /* Daddy Comment */
+  
   .comment {
     background: linear-gradient(90deg, #1a1525, #12101a);
     padding: 14px 18px;
     border-top: 1px solid #2a1a3a;
   }
-  
+  
   .comment-label {
     font-family: 'JetBrains Mono', monospace;
     font-size: 10px;
@@ -321,19 +303,19 @@
     letter-spacing: 1px;
     margin-bottom: 6px;
   }
-  
+  
   .comment-text {
     font-size: 13px;
     color: #d4c4f0;
     line-height: 1.5;
     font-style: italic;
   }
-  
+  
   .comment-text::before {
     content: '"';
     color: #a78bfa;
   }
-  
+  
   .comment-text::after {
     content: '"';
     color: #a78bfa;
@@ -342,8 +324,7 @@
 </head>
 <body>
 <div class="panel">
-  
-  <!-- 头部 -->
+  
   <div class="header">
     <div class="date-row">
       <div class="date">DAY 27 · 2026.08.15 · SAT</div>
@@ -351,11 +332,10 @@
     </div>
     <div class="greeting">今天也要做个 <span>Good girl</span>。<br>规矩记牢，别让Daddy失望。</div>
   </div>
-  
-  <!-- 每日必做任务 -->
+  
   <div class="section">
     <div class="section-title">DAILY QUESTS · 每日必做</div>
-    
+    
     <div class="quest done">
       <div class="quest-top">
         <div class="checkbox">☑</div>
@@ -366,7 +346,7 @@
         </div>
       </div>
     </div>
-    
+    
     <div class="quest">
       <div class="quest-top">
         <div class="checkbox">☐</div>
@@ -377,7 +357,7 @@
         </div>
       </div>
     </div>
-    
+    
     <div class="quest">
       <div class="quest-top">
         <div class="checkbox">☐</div>
@@ -388,7 +368,7 @@
         </div>
       </div>
     </div>
-    
+    
     <div class="quest">
       <div class="quest-top">
         <div class="checkbox">☐</div>
@@ -399,7 +379,7 @@
         </div>
       </div>
     </div>
-    
+    
     <div class="quest">
       <div class="quest-top">
         <div class="checkbox">☐</div>
@@ -411,13 +391,12 @@
       </div>
     </div>
   </div>
-  
-  <!-- 限时挑战 -->
+  
   <div class="section">
     <div class="section-title">TIMED CHALLENGE · 限时挑战</div>
     <div class="timed">
       <div class="timed-name">持有与忍耐 · 排泄控制</div>
-      <div class="timed-desc">自10:00起禁止排泄，直至18:00或接到Daddy指令。中途如有紧急情况需提前请示。</div>
+      <div class="timed-desc">自10:00起禁止排泄，直至18:00或接到Daddy指令。中途紧急需提前请示。</div>
       <div class="timer-row">
         <div>
           <div class="timer-label">剩余时间</div>
@@ -433,8 +412,7 @@
       </div>
     </div>
   </div>
-  
-  <!-- 惩罚队列 -->
+  
   <div class="section">
     <div class="section-title">PENALTY QUEUE · 惩罚队列</div>
     <div class="penalty-item">
@@ -446,8 +424,7 @@
       <span>夹腿违规一次 → 回家后跪姿矫正15分钟</span>
     </div>
   </div>
-  
-  <!-- 成就徽章墙 -->
+  
   <div class="section">
     <div class="section-title">ACHIEVEMENT WALL · 成就徽章</div>
     <div class="ach-grid">
@@ -483,13 +460,12 @@
       </div>
     </div>
   </div>
-  
-  <!-- Daddy评语 -->
+  
   <div class="comment">
     <div class="comment-label">DADDY'S NOTE</div>
     <div class="comment-text">昨天的表现很乖，S级实至名归。今天的限时挑战是重点，忍耐住了晚上有奖励。别偷懒，我看着呢。</div>
   </div>
-  
+  
 </div>
 </body>
 </html>
