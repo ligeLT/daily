@@ -2,18 +2,18 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Daily Quest Panel</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
   
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   
   body {
     background: #0a0c12;
     display: flex;
     justify-content: center;
-    padding: 24px 12px;
+    padding: 20px 12px;
     font-family: 'Noto Sans SC', system-ui, sans-serif;
     color: #e0e6f0;
     min-height: 100vh;
@@ -25,7 +25,7 @@
     background: linear-gradient(160deg, #12161f 0%, #0d1118 100%);
     border: 1px solid #1e2a3a;
     border-radius: 12px;
-    box-shadow: 0 0 40px rgba(0, 200, 255, 0.08), inset 0 1px 0 rgba(255,255,255,0.05);
+    box-shadow: 0 0 40px rgba(0, 200, 255, 0.08);
     overflow: hidden;
   }
   
@@ -55,7 +55,6 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
     color: #7a8ba3;
-    letter-spacing: 0.5px;
   }
   
   .score {
@@ -76,9 +75,7 @@
     line-height: 1.4;
   }
   
-  .greeting span {
-    color: #ff6b9d;
-  }
+  .greeting span { color: #ff6b9d; }
   
   .section {
     padding: 14px 18px;
@@ -91,7 +88,6 @@
     font-weight: 600;
     color: #00d4ff;
     letter-spacing: 1.5px;
-    text-transform: uppercase;
     margin-bottom: 12px;
     display: flex;
     align-items: center;
@@ -112,30 +108,36 @@
     border-radius: 8px;
     padding: 12px 14px;
     margin-bottom: 8px;
+    transition: all 0.2s;
   }
   
   .quest:last-child { margin-bottom: 0; }
   
   .quest.done {
     border-color: #1a3a2a;
-    opacity: 0.75;
+    opacity: 0.7;
   }
   
   .quest-top {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
+    gap: 12px;
   }
   
   .checkbox {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 16px;
-    color: #4a5a6a;
-    line-height: 1.2;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
     flex-shrink: 0;
+    width: 28px;
+    text-align: center;
+    color: #4a5a6a;
   }
   
-  .quest.done .checkbox { color: #22c55e; }
+  .quest.done .checkbox {
+    color: #22c55e;
+  }
   
   .quest-info { flex: 1; }
   
@@ -164,9 +166,7 @@
     font-family: 'JetBrains Mono', monospace;
   }
   
-  .quest-reward.punish {
-    color: #c45a5a;
-  }
+  .quest-reward.punish { color: #c45a5a; }
   
   .timed {
     background: linear-gradient(135deg, #1a1520, #12101a);
@@ -200,7 +200,6 @@
     font-size: 18px;
     font-weight: 700;
     color: #ff6b9d;
-    letter-spacing: 1px;
   }
   
   .timer-label {
@@ -220,7 +219,6 @@
     width: 62%;
     background: linear-gradient(90deg, #c026d3, #e879f9, #f0abfc);
     border-radius: 3px;
-    box-shadow: 0 0 8px #c026d366;
   }
   
   .penalty-item {
@@ -240,9 +238,10 @@
     padding: 2px 6px;
     border-radius: 3px;
     flex-shrink: 0;
+    background: #2a2200;
+    color: #fbbf24;
+    border: 1px solid #5a4a00;
   }
-  
-  .status.wait { background: #2a2200; color: #fbbf24; border: 1px solid #5a4a00; }
   
   .ach-grid {
     display: grid;
@@ -263,10 +262,7 @@
     opacity: 0.7;
   }
   
-  .ach-icon {
-    font-size: 16px;
-    margin-bottom: 4px;
-  }
+  .ach-icon { font-size: 16px; margin-bottom: 4px; }
   
   .ach-name {
     font-weight: 600;
@@ -275,9 +271,7 @@
     font-size: 12px;
   }
   
-  .ach.locked .ach-name {
-    color: #5a6a7a;
-  }
+  .ach.locked .ach-name { color: #5a6a7a; }
   
   .ach-cond {
     font-size: 11px;
@@ -285,15 +279,9 @@
     line-height: 1.3;
   }
   
-  .ach.hidden .ach-name {
-    letter-spacing: 2px;
-    color: #3a4a5a;
-  }
-  
   .comment {
     background: linear-gradient(90deg, #1a1525, #12101a);
     padding: 14px 18px;
-    border-top: 1px solid #2a1a3a;
   }
   
   .comment-label {
@@ -310,16 +298,6 @@
     line-height: 1.5;
     font-style: italic;
   }
-  
-  .comment-text::before {
-    content: '"';
-    color: #a78bfa;
-  }
-  
-  .comment-text::after {
-    content: '"';
-    color: #a78bfa;
-  }
 </style>
 </head>
 <body>
@@ -327,7 +305,7 @@
   
   <div class="header">
     <div class="date-row">
-      <div class="date">DAY 27 · 2026.08.15 · SAT</div>
+      <div class="date">DAY 28 · 2026.08.16 · SUN</div>
       <div class="score">昨日评级 · S</div>
     </div>
     <div class="greeting">今天也要做个 <span>Good girl</span>。<br>规矩记牢，别让Daddy失望。</div>
@@ -336,20 +314,20 @@
   <div class="section">
     <div class="section-title">DAILY QUESTS · 每日必做</div>
     
-    <div class="quest done">
+    <div class="quest" data-id="quest1">
       <div class="quest-top">
-        <div class="checkbox">☑</div>
+        <div class="checkbox" onclick="toggleQuest(this)">☐</div>
         <div class="quest-info">
           <div class="quest-name">晨起边缘训练</div>
           <div class="quest-desc">醒来后立即完成3轮寸止，边缘后停止，禁止高潮。</div>
-          <div class="quest-reward">奖励：+15 服从点 · 已完成</div>
+          <div class="quest-reward">奖励：+15 服从点</div>
         </div>
       </div>
     </div>
     
-    <div class="quest">
+    <div class="quest" data-id="quest2">
       <div class="quest-top">
-        <div class="checkbox">☐</div>
+        <div class="checkbox" onclick="toggleQuest(this)">☐</div>
         <div class="quest-info">
           <div class="quest-name">饮水管控协议</div>
           <div class="quest-desc">今日必须饮用不少于1500ml水，每2小时汇报一次饮水量。</div>
@@ -358,9 +336,9 @@
       </div>
     </div>
     
-    <div class="quest">
+    <div class="quest" data-id="quest3">
       <div class="quest-top">
-        <div class="checkbox">☐</div>
+        <div class="checkbox" onclick="toggleQuest(this)">☐</div>
         <div class="quest-info">
           <div class="quest-name">姿态校准</div>
           <div class="quest-desc">全天禁止夹腿，坐姿保持双膝分开至少一拳，随时接受抽查。</div>
@@ -369,9 +347,9 @@
       </div>
     </div>
     
-    <div class="quest">
+    <div class="quest" data-id="quest4">
       <div class="quest-top">
-        <div class="checkbox">☐</div>
+        <div class="checkbox" onclick="toggleQuest(this)">☐</div>
         <div class="quest-info">
           <div class="quest-name">出门检查清单</div>
           <div class="quest-desc">出门前玄关站定报备，确认已佩戴指定道具，并拍摄着装确认图。</div>
@@ -380,9 +358,9 @@
       </div>
     </div>
     
-    <div class="quest">
+    <div class="quest" data-id="quest5">
       <div class="quest-top">
-        <div class="checkbox">☐</div>
+        <div class="checkbox" onclick="toggleQuest(this)">☐</div>
         <div class="quest-info">
           <div class="quest-name">定时心跳汇报</div>
           <div class="quest-desc">12:00 / 18:00 / 21:00 准时发送状态汇报（当前感觉+任务进度）。</div>
@@ -416,11 +394,11 @@
   <div class="section">
     <div class="section-title">PENALTY QUEUE · 惩罚队列</div>
     <div class="penalty-item">
-      <span class="status wait">⏳ 等待执行</span>
+      <span class="status">⏳ 等待执行</span>
       <span>昨日汇报延迟4分钟 → 晚间面壁思考10分钟</span>
     </div>
     <div class="penalty-item">
-      <span class="status wait">⏳ 等待执行</span>
+      <span class="status">⏳ 等待执行</span>
       <span>夹腿违规一次 → 回家后跪姿矫正15分钟</span>
     </div>
   </div>
@@ -453,7 +431,7 @@
         <div class="ach-name">惩 ▋戒 ▋达 ▋人</div>
         <div class="ach-cond">累计接受打屁股达到？？下</div>
       </div>
-      <div class="ach locked hidden">
+      <div class="ach locked">
         <div class="ach-icon">❓</div>
         <div class="ach-name">▓▓▓▓▓▓</div>
         <div class="ach-cond">条件未知 · 隐藏成就</div>
@@ -463,9 +441,48 @@
   
   <div class="comment">
     <div class="comment-label">DADDY'S NOTE</div>
-    <div class="comment-text">昨天的表现很乖，S级实至名归。今天的限时挑战是重点，忍耐住了晚上有奖励。别偷懒，我看着呢。</div>
+    <div class="comment-text">"昨天的表现很乖，S级实至名归。今天的限时挑战是重点，忍耐住了晚上有奖励。别偷懒，我看着呢。"</div>
   </div>
   
 </div>
+
+<script>
+  // 加载保存的勾选状态
+  function loadState() {
+    const quests = document.querySelectorAll('.quest');
+    quests.forEach(quest => {
+      const id = quest.dataset.id;
+      const checked = localStorage.getItem(id) === 'true';
+      const checkbox = quest.querySelector('.checkbox');
+      if (checked) {
+        quest.classList.add('done');
+        checkbox.textContent = '☑';
+      } else {
+        quest.classList.remove('done');
+        checkbox.textContent = '☐';
+      }
+    });
+  }
+
+  // 切换勾选
+  function toggleQuest(el) {
+    const quest = el.closest('.quest');
+    const id = quest.dataset.id;
+    const isDone = quest.classList.contains('done');
+    
+    if (isDone) {
+      quest.classList.remove('done');
+      el.textContent = '☐';
+      localStorage.setItem(id, 'false');
+    } else {
+      quest.classList.add('done');
+      el.textContent = '☑';
+      localStorage.setItem(id, 'true');
+    }
+  }
+
+  // 页面加载时恢复状态
+  loadState();
+</script>
 </body>
 </html>
