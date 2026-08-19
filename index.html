@@ -1,488 +1,1090 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Daily Quest Panel</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
-  
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  
-  body {
-    background: #0a0c12;
-    display: flex;
-    justify-content: center;
-    padding: 20px 12px;
-    font-family: 'Noto Sans SC', system-ui, sans-serif;
-    color: #e0e6f0;
-    min-height: 100vh;
-  }
-  
-  .panel {
-    width: 100%;
-    max-width: 440px;
-    background: linear-gradient(160deg, #12161f 0%, #0d1118 100%);
-    border: 1px solid #1e2a3a;
-    border-radius: 12px;
-    box-shadow: 0 0 40px rgba(0, 200, 255, 0.08);
-    overflow: hidden;
-  }
-  
-  .header {
-    background: linear-gradient(90deg, #0f1724, #132033);
-    padding: 16px 18px 14px;
-    border-bottom: 1px solid #1e2a3a;
-    position: relative;
-  }
-  
-  .header::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #00d4ff44, transparent);
-  }
-  
-  .date-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-  
-  .date {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: #7a8ba3;
-  }
-  
-  .score {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    font-weight: 700;
-    color: #ffd700;
-    background: #2a2200;
-    padding: 2px 8px;
-    border-radius: 4px;
-    border: 1px solid #5a4a00;
-  }
-  
-  .greeting {
-    font-size: 15px;
-    font-weight: 500;
-    color: #f0f4ff;
-    line-height: 1.4;
-  }
-  
-  .greeting span { color: #ff6b9d; }
-  
-  .section {
-    padding: 14px 18px;
-    border-bottom: 1px solid #1a2332;
-  }
-  
-  .section-title {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    font-weight: 600;
-    color: #00d4ff;
-    letter-spacing: 1.5px;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  
-  .section-title::before {
-    content: '';
-    width: 3px;
-    height: 12px;
-    background: #00d4ff;
-    border-radius: 1px;
-  }
-  
-  .quest {
-    background: #0f141c;
-    border: 1px solid #1c2738;
-    border-radius: 8px;
-    padding: 12px 14px;
-    margin-bottom: 8px;
-    transition: all 0.2s;
-  }
-  
-  .quest:last-child { margin-bottom: 0; }
-  
-  .quest.done {
-    border-color: #1a3a2a;
-    opacity: 0.7;
-  }
-  
-  .quest-top {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  
-  .checkbox {
-    font-size: 22px;
-    line-height: 1;
-    cursor: pointer;
-    user-select: none;
-    flex-shrink: 0;
-    width: 28px;
-    text-align: center;
-    color: #4a5a6a;
-  }
-  
-  .quest.done .checkbox {
-    color: #22c55e;
-  }
-  
-  .quest-info { flex: 1; }
-  
-  .quest-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: #e8eef8;
-    margin-bottom: 3px;
-  }
-  
-  .quest.done .quest-name {
-    text-decoration: line-through;
-    color: #6a7a8a;
-  }
-  
-  .quest-desc {
-    font-size: 12px;
-    color: #8a9ab0;
-    line-height: 1.45;
-    margin-bottom: 6px;
-  }
-  
-  .quest-reward {
-    font-size: 11px;
-    color: #5a9a6a;
-    font-family: 'JetBrains Mono', monospace;
-  }
-  
-  .quest-reward.punish { color: #c45a5a; }
-  
-  .timed {
-    background: linear-gradient(135deg, #1a1520, #12101a);
-    border: 1px solid #3a2a4a;
-    border-radius: 8px;
-    padding: 14px;
-  }
-  
-  .timed-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: #e8b4ff;
-    margin-bottom: 4px;
-  }
-  
-  .timed-desc {
-    font-size: 12px;
-    color: #a08ab8;
-    margin-bottom: 10px;
-  }
-  
-  .timer-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-  
-  .timer {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 18px;
-    font-weight: 700;
-    color: #ff6b9d;
-  }
-  
-  .timer-label {
-    font-size: 11px;
-    color: #7a6a8a;
-  }
-  
-  .progress-bar {
-    height: 6px;
-    background: #1a1525;
-    border-radius: 3px;
-    overflow: hidden;
-  }
-  
-  .progress-fill {
-    height: 100%;
-    width: 62%;
-    background: linear-gradient(90deg, #c026d3, #e879f9, #f0abfc);
-    border-radius: 3px;
-  }
-  
-  .penalty-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 0;
-    border-bottom: 1px dashed #1e2a3a;
-    font-size: 13px;
-  }
-  
-  .penalty-item:last-child { border-bottom: none; }
-  
-  .status {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    padding: 2px 6px;
-    border-radius: 3px;
-    flex-shrink: 0;
-    background: #2a2200;
-    color: #fbbf24;
-    border: 1px solid #5a4a00;
-  }
-  
-  .ach-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-  
-  .ach {
-    background: #0f141c;
-    border: 1px solid #2a3a1a;
-    border-radius: 6px;
-    padding: 10px;
-    font-size: 12px;
-  }
-  
-  .ach.locked {
-    border-color: #1e2a3a;
-    opacity: 0.7;
-  }
-  
-  .ach-icon { font-size: 16px; margin-bottom: 4px; }
-  
-  .ach-name {
-    font-weight: 600;
-    color: #ffd700;
-    margin-bottom: 2px;
-    font-size: 12px;
-  }
-  
-  .ach.locked .ach-name { color: #5a6a7a; }
-  
-  .ach-cond {
-    font-size: 11px;
-    color: #7a8a9a;
-    line-height: 1.3;
-  }
-  
-  .comment {
-    background: linear-gradient(90deg, #1a1525, #12101a);
-    padding: 14px 18px;
-  }
-  
-  .comment-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    color: #a78bfa;
-    letter-spacing: 1px;
-    margin-bottom: 6px;
-  }
-  
-  .comment-text {
-    font-size: 13px;
-    color: #d4c4f0;
-    line-height: 1.5;
-    font-style: italic;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日常调教任务面板系统 - Daily Quest Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans SC"', 'sans-serif'],
+                        mono: ['"Fira Code"', 'monospace'],
+                    },
+                    colors: {
+                        cyber: {
+                            bg: '#090d16',
+                            card: '#111827',
+                            border: '#1f293d',
+                            green: '#10b981',
+                            greenGlow: '#059669',
+                            red: '#f43f5e',
+                            amber: '#f59e0b',
+                            cyan: '#06b6d4',
+                            purple: '#a855f7',
+                            gold: '#fbbf24'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050811;
+            color: #e2e8f0;
+            font-family: 'Noto Sans SC', sans-serif;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.08) 0%, transparent 60%),
+                radial-gradient(circle at 50% 100%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        /* Scanline effect for Cyber UI */
+        .scanlines {
+            position: relative;
+            overflow: hidden;
+        }
+        .scanlines::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 20;
+            background-size: 100% 3px, 6px 100%;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* Neon Glow Effects */
+        .neon-border-green {
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.25), inset 0 0 10px rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+        .neon-border-red {
+            box-shadow: 0 0 12px rgba(244, 63, 94, 0.3), inset 0 0 8px rgba(244, 63, 94, 0.15);
+            border-color: rgba(244, 63, 94, 0.6);
+        }
+        .neon-border-purple {
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.25);
+            border-color: rgba(168, 85, 247, 0.4);
+        }
+        .neon-text-gold {
+            text-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+        }
+        .neon-text-green {
+            text-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+        }
+        .neon-text-cyan {
+            text-shadow: 0 0 8px rgba(6, 182, 212, 0.6);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f293d;
+            border-radius: 2px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #06b6d4;
+        }
+
+        /* Animated Progress Gradient */
+        .progress-gradient {
+            background: linear-gradient(90deg, #10b981 0%, #06b6d4 50%, #a855f7 100%);
+            background-size: 200% 100%;
+            animation: gradientMove 4s ease infinite;
+        }
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Custom Checkbox Animation */
+        .cyber-checkbox {
+            appearance: none;
+            background-color: rgba(15, 23, 42, 0.8);
+            border: 1.5px solid #334155;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .cyber-checkbox:checked {
+            background-color: #10b981;
+            border-color: #10b981;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+        }
+        .cyber-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            color: #090d16;
+            font-weight: 900;
+            font-size: 11px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Achievement blur preview */
+        .masked-text {
+            filter: blur(3.5px);
+            user-select: none;
+            opacity: 0.6;
+        }
+
+        .gold-border-glow {
+            border: 1px solid #fbbf24;
+            box-shadow: 0 0 8px rgba(251, 191, 36, 0.3);
+        }
+    </style>
 </head>
-<body>
-<div class="panel">
-  
-  <div class="header">
-    <div class="date-row">
-      <div class="date">DAY 28 · 2026.08.16 · SUN</div>
-      <div class="score">昨日评级 · S</div>
-    </div>
-    <div class="greeting">今天也要做个 <span>Good girl</span>。<br>规矩记牢，别让Daddy失望。</div>
-  </div>
-  
-  <div class="section">
-    <div class="section-title">DAILY QUESTS · 每日必做</div>
-    
-    <div class="quest" data-id="quest1">
-      <div class="quest-top">
-        <div class="checkbox" onclick="toggleQuest(this)">☐</div>
-        <div class="quest-info">
-          <div class="quest-name">晨起边缘训练</div>
-          <div class="quest-desc">醒来后立即完成3轮寸止，边缘后停止，禁止高潮。</div>
-          <div class="quest-reward">奖励：+15 服从点</div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="quest" data-id="quest2">
-      <div class="quest-top">
-        <div class="checkbox" onclick="toggleQuest(this)">☐</div>
-        <div class="quest-info">
-          <div class="quest-name">饮水管控协议</div>
-          <div class="quest-desc">今日必须饮用不少于1500ml水，每2小时汇报一次饮水量。</div>
-          <div class="quest-reward punish">未完成 → 额外憋尿30分钟</div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="quest" data-id="quest3">
-      <div class="quest-top">
-        <div class="checkbox" onclick="toggleQuest(this)">☐</div>
-        <div class="quest-info">
-          <div class="quest-name">姿态校准</div>
-          <div class="quest-desc">全天禁止夹腿，坐姿保持双膝分开至少一拳，随时接受抽查。</div>
-          <div class="quest-reward">完成 → 今晚可获得一次轻抚奖励</div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="quest" data-id="quest4">
-      <div class="quest-top">
-        <div class="checkbox" onclick="toggleQuest(this)">☐</div>
-        <div class="quest-info">
-          <div class="quest-name">出门检查清单</div>
-          <div class="quest-desc">出门前玄关站定报备，确认已佩戴指定道具，并拍摄着装确认图。</div>
-          <div class="quest-reward punish">违规 → 回家后立即执行10下戒尺</div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="quest" data-id="quest5">
-      <div class="quest-top">
-        <div class="checkbox" onclick="toggleQuest(this)">☐</div>
-        <div class="quest-info">
-          <div class="quest-name">定时心跳汇报</div>
-          <div class="quest-desc">12:00 / 18:00 / 21:00 准时发送状态汇报（当前感觉+任务进度）。</div>
-          <div class="quest-reward">全勤 → +10 信任点</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="section">
-    <div class="section-title">TIMED CHALLENGE · 限时挑战</div>
-    <div class="timed">
-      <div class="timed-name">持有与忍耐 · 排泄控制</div>
-      <div class="timed-desc">自10:00起禁止排泄，直至18:00或接到Daddy指令。中途紧急需提前请示。</div>
-      <div class="timer-row">
-        <div>
-          <div class="timer-label">剩余时间</div>
-          <div class="timer">02:47:33</div>
-        </div>
-        <div style="text-align:right">
-          <div class="timer-label">进度</div>
-          <div style="font-family:'JetBrains Mono';font-size:13px;color:#e879f9;">62%</div>
-        </div>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill"></div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="section">
-    <div class="section-title">PENALTY QUEUE · 惩罚队列</div>
-    <div class="penalty-item">
-      <span class="status">⏳ 等待执行</span>
-      <span>昨日汇报延迟4分钟 → 晚间面壁思考10分钟</span>
-    </div>
-    <div class="penalty-item">
-      <span class="status">⏳ 等待执行</span>
-      <span>夹腿违规一次 → 回家后跪姿矫正15分钟</span>
-    </div>
-  </div>
-  
-  <div class="section">
-    <div class="section-title">ACHIEVEMENT WALL · 成就徽章</div>
-    <div class="ach-grid">
-      <div class="ach">
-        <div class="ach-icon">🏅</div>
-        <div class="ach-name">完美服从者</div>
-        <div class="ach-cond">连续7天全勤完成所有每日任务</div>
-      </div>
-      <div class="ach">
-        <div class="ach-icon">🏅</div>
-        <div class="ach-name">边缘大师</div>
-        <div class="ach-cond">单次寸止坚持超过45分钟</div>
-      </div>
-      <div class="ach locked">
-        <div class="ach-icon">🔒</div>
-        <div class="ach-name">耐 ▋力 ▋纪 ▋录</div>
-        <div class="ach-cond">单次憋尿时长达到？？分钟</div>
-      </div>
-      <div class="ach locked">
-        <div class="ach-icon">🔒</div>
-        <div class="ach-name">公 ▋共 ▋挑 ▋战</div>
-        <div class="ach-cond">在公共场合成功完成指定任务</div>
-      </div>
-      <div class="ach locked">
-        <div class="ach-icon">🔒</div>
-        <div class="ach-name">惩 ▋戒 ▋达 ▋人</div>
-        <div class="ach-cond">累计接受打屁股达到？？下</div>
-      </div>
-      <div class="ach locked">
-        <div class="ach-icon">❓</div>
-        <div class="ach-name">▓▓▓▓▓▓</div>
-        <div class="ach-cond">条件未知 · 隐藏成就</div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="comment">
-    <div class="comment-label">DADDY'S NOTE</div>
-    <div class="comment-text">"昨天的表现很乖，S级实至名归。今天的限时挑战是重点，忍耐住了晚上有奖励。别偷懒，我看着呢。"</div>
-  </div>
-  
-</div>
+<body class="min-h-screen flex flex-col items-center justify-start p-2 sm:p-4 select-none">
 
-<script>
-  // 加载保存的勾选状态
-  function loadState() {
-    const quests = document.querySelectorAll('.quest');
-    quests.forEach(quest => {
-      const id = quest.dataset.id;
-      const checked = localStorage.getItem(id) === 'true';
-      const checkbox = quest.querySelector('.checkbox');
-      if (checked) {
-        quest.classList.add('done');
-        checkbox.textContent = '☑';
-      } else {
-        quest.classList.remove('done');
-        checkbox.textContent = '☐';
-      }
-    });
-  }
+    <!-- Main Outer UI Frame (Max 440px Centered) -->
+    <div class="w-full max-w-[440px] bg-cyber-bg border border-cyber-border rounded-xl shadow-2xl scanlines overflow-hidden relative mb-8">
+        
+        <!-- Header Top Bar (Controls & System Status) -->
+        <div class="bg-slate-900/90 border-b border-cyber-border p-3">
+            <div class="flex items-center justify-between gap-2 mb-2">
+                <div class="flex items-center gap-1.5 text-xs font-mono text-cyan-400 font-bold tracking-wider">
+                    <span class="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                    DOM_SYSTEM_v2.4
+                </div>
+                <!-- Sound Toggle -->
+                <button id="soundToggleBtn" onclick="toggleAudio()" class="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 hover:text-cyan-400 flex items-center gap-1 transition">
+                    <span id="soundIcon">🔊</span> <span id="soundText">音效 ON</span>
+                </button>
+            </div>
 
-  // 切换勾选
-  function toggleQuest(el) {
-    const quest = el.closest('.quest');
-    const id = quest.dataset.id;
-    const isDone = quest.classList.contains('done');
-    
-    if (isDone) {
-      quest.classList.remove('done');
-      el.textContent = '☐';
-      localStorage.setItem(id, 'false');
-    } else {
-      quest.classList.add('done');
-      el.textContent = '☑';
-      localStorage.setItem(id, 'true');
-    }
-  }
+            <!-- Date Selector and Refresh Controller -->
+            <div class="flex items-center justify-between gap-1.5 bg-slate-950/80 p-1.5 rounded-lg border border-slate-800">
+                <button onclick="changeDate(-1)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs font-mono font-bold transition">◀</button>
+                <div class="flex items-center gap-1">
+                    <input type="date" id="dateInput" class="bg-transparent text-xs font-mono text-cyan-300 font-bold focus:outline-none cursor-pointer text-center" onchange="onDateInputChange(this.value)">
+                </div>
+                <button onclick="changeDate(1)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs font-mono font-bold transition">▶</button>
+                <button onclick="resetTodayPanel()" class="px-2.5 py-1 bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-800 rounded text-xs font-mono font-semibold transition flex items-center gap-1">
+                    <span>↻</span> 刷新
+                </button>
+            </div>
+        </div>
 
-  // 页面加载时恢复状态
-  loadState();
-</script>
+        <!-- Header Content Box -->
+        <div class="p-3.5 bg-gradient-to-b from-slate-900/80 to-cyber-bg border-b border-cyber-border space-y-3">
+            <div class="flex items-start justify-between">
+                <div>
+                    <div class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">SUB ASSIGNMENT // PROFILE</div>
+                    <div class="text-sm font-bold text-slate-100 flex items-center gap-1.5 mt-0.5">
+                        <span>今日指令 :</span>
+                    </div>
+                    <p id="domDirective" class="text-xs text-rose-300 italic font-medium mt-1 bg-rose-950/30 border-l-2 border-rose-500 pl-2 py-0.5 rounded-r">
+                        "今天也要做个 Good girl。"
+                    </p>
+                </div>
+                <!-- Yesterday Grade -->
+                <div class="flex flex-col items-center justify-center bg-slate-950 border border-slate-800 rounded-lg p-2 min-w-[64px]">
+                    <span class="text-[9px] font-mono text-slate-400">昨日评级</span>
+                    <span id="yesterdayGrade" class="text-xl font-black font-mono text-amber-400 neon-text-gold mt-0.5">—</span>
+                </div>
+            </div>
+
+            <!-- Overall Daily Completion Progress -->
+            <div class="space-y-1">
+                <div class="flex justify-between items-center text-[11px] font-mono">
+                    <span class="text-slate-400">今日指令完成度</span>
+                    <span id="progressPercent" class="text-cyan-400 font-bold">0% (0/0)</span>
+                </div>
+                <div class="w-full h-2.5 bg-slate-950 rounded-full border border-slate-800 p-0.5 overflow-hidden">
+                    <div id="progressBar" class="h-full rounded-full progress-gradient transition-all duration-500" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 1: DAILY QUESTS (每日必做任务区) -->
+        <div class="p-3.5 space-y-2.5">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-emerald-400 text-sm">✦</span>
+                    <h2 class="text-xs font-bold font-mono tracking-wider text-slate-200 uppercase">每日必做任务 (DAILY QUESTS)</h2>
+                </div>
+                <span id="questCountBadge" class="text-[10px] font-mono px-1.5 py-0.5 bg-emerald-950/80 text-emerald-400 border border-emerald-800 rounded">5/5 Task</span>
+            </div>
+
+            <!-- Task List Container -->
+            <div id="questList" class="space-y-2">
+                <!-- Dynamic Tasks Rendered Here -->
+            </div>
+        </div>
+
+        <!-- SECTION 2: TIMED CHALLENGE (限时挑战区) -->
+        <div class="p-3.5 pt-1 space-y-2">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-cyan-400 text-sm">⏱</span>
+                    <h2 class="text-xs font-bold font-mono tracking-wider text-slate-200 uppercase">限时特殊挑战 (TIMED CHALLENGE)</h2>
+                </div>
+                <span class="text-[9px] font-mono text-cyan-400 bg-cyan-950/60 px-1.5 py-0.5 border border-cyan-800 rounded">SPECIAL</span>
+            </div>
+
+            <div id="timedChallengeCard" class="bg-slate-900/80 border border-cyan-900/50 rounded-lg p-3 space-y-2.5 relative overflow-hidden">
+                <div class="flex items-start justify-between gap-2">
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span id="challengeName" class="text-xs font-bold text-cyan-200">边缘控压与跳蛋持续放置</span>
+                        </div>
+                        <p id="challengeDesc" class="text-[11px] text-slate-400 mt-1">
+                            在低频刺激下保持极界边缘状态，禁止自主高潮。
+                        </p>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <div id="challengeTimer" class="text-sm font-mono font-bold text-cyan-300 neon-text-cyan">30:00</div>
+                        <div class="text-[9px] font-mono text-slate-500">时限 30 分钟</div>
+                    </div>
+                </div>
+
+                <!-- Challenge Progress Meter -->
+                <div class="space-y-1">
+                    <div class="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                        <div id="challengeMeter" class="h-full bg-cyan-400 transition-all duration-300" style="width: 100%;"></div>
+                    </div>
+                </div>
+
+                <!-- Action Controls for Challenge -->
+                <div class="flex items-center justify-between gap-2 pt-1">
+                    <div class="text-[10px] font-mono text-slate-400" id="challengeTimeRange">
+                        起止: 14:00 - 14:30
+                    </div>
+                    <div class="flex gap-1.5">
+                        <button id="startChallengeBtn" onclick="toggleChallengeTimer()" class="px-2.5 py-1 bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-700 text-[10px] font-mono font-bold rounded transition">
+                            ▶ 开始挑战
+                        </button>
+                        <button id="completeChallengeBtn" onclick="completeChallenge()" class="px-2.5 py-1 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-700 text-[10px] font-mono font-bold rounded transition">
+                            ✓ 标记完成
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: PENALTY QUEUE & STATS (惩罚队列与清算模块) -->
+        <div class="p-3.5 pt-1 space-y-2.5">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-rose-500 text-sm">⚡</span>
+                    <h2 class="text-xs font-bold font-mono tracking-wider text-slate-200 uppercase">惩罚队列 (PENALTY QUEUE)</h2>
+                </div>
+                <span class="text-[9px] font-mono text-rose-400 bg-rose-950/60 px-1.5 py-0.5 border border-rose-800 rounded">待清算事项</span>
+            </div>
+
+            <!-- Dynamic Penalty Queue Container -->
+            <div id="penaltyQueueList" class="space-y-2 min-h-[48px]">
+                <!-- Dynamic Penalty Cards Rendered Here -->
+            </div>
+
+            <!-- Cumulative Penalty Breakdown Stats Module -->
+            <div class="bg-slate-950/90 border border-slate-800 rounded-lg p-2.5 space-y-2">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-1">
+                    <span class="text-[10px] font-mono text-slate-400 font-bold uppercase flex items-center gap-1">
+                        📊 历史累计惩罚总统计 <span class="text-[9px] text-slate-500 font-normal">(自首日至今)</span>
+                    </span>
+                    <span id="totalPenaltyCount" class="text-[10px] font-mono font-bold text-rose-400">0 项已结算</span>
+                </div>
+                <div id="penaltyStatsBreakdown" class="grid grid-cols-2 gap-1.5 text-[10px] font-mono">
+                    <!-- Dynamic breakdown items -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 4: ACHIEVEMENT WALL (成就徽章墙) -->
+        <div class="p-3.5 pt-1 space-y-2.5">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-amber-400 text-sm">🏅</span>
+                    <h2 class="text-xs font-bold font-mono tracking-wider text-slate-200 uppercase">成就徽章墙 (ACHIEVEMENTS)</h2>
+                </div>
+                <span id="achievementProgressText" class="text-[10px] font-mono text-amber-400">2/6 已解锁</span>
+            </div>
+
+            <div id="achievementGrid" class="grid grid-cols-2 gap-2">
+                <!-- Achievements rendered via JS -->
+            </div>
+        </div>
+
+        <!-- SECTION 5: DADDY / DOM COMMENTS & FOOTER (Daddy 评语区) -->
+        <div class="p-3.5 bg-slate-950 border-t border-cyber-border space-y-2">
+            <div class="flex items-center gap-1.5">
+                <span class="text-purple-400 text-xs">👑</span>
+                <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">DADDY'S DAILY REMARK // 评语</span>
+            </div>
+            <div class="bg-purple-950/20 border border-purple-900/40 rounded-lg p-3 relative">
+                <p id="domRemark" class="text-xs text-purple-200 italic font-medium leading-relaxed">
+                    "规矩不是束缚，而是让你安心依附我的缰绳。今晚期待你的检讨。"
+                </p>
+            </div>
+            <div class="text-[9px] font-mono text-center text-slate-600 pt-1">
+                SYSTEM ID: BDSM-DAILY-001 // INITIALIZED AT INITIAL_DATE
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /* ==========================================================================
+           1. AUDIO SYNTHESIZER ENGINE (Web Audio API)
+           ========================================================================== */
+        let audioEnabled = true;
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) audioCtx = new AudioContext();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            document.getElementById('soundIcon').innerText = audioEnabled ? '🔊' : '🔇';
+            document.getElementById('soundText').innerText = audioEnabled ? '音效 ON' : '音效 OFF';
+            if (audioEnabled) playSound('click');
+        }
+
+        function playSound(type) {
+            if (!audioEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                const now = ctx.currentTime;
+
+                if (type === 'check') {
+                    // Upward chime
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.12); // A5
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                    osc.start(now);
+                    osc.stop(now + 0.12);
+                } else if (type === 'uncheck') {
+                    // Downward dull tone
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(200, now + 0.15);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'statusCycle') {
+                    // Synth pulse
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.setValueAtTime(750, now + 0.05);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } else if (type === 'click') {
+                    // Subtle tick
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, now);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+                    osc.start(now);
+                    osc.stop(now + 0.04);
+                } else if (type === 'challengeEnd') {
+                    // Cyber triumph chord
+                    [523.25, 659.25, 783.99].forEach((freq, idx) => {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.type = 'sine';
+                        o.frequency.setValueAtTime(freq, now + idx * 0.05);
+                        g.gain.setValueAtTime(0.1, now + idx * 0.05);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + 0.4 + idx * 0.05);
+                        o.connect(g);
+                        g.connect(ctx.destination);
+                        o.start(now + idx * 0.05);
+                        o.stop(now + 0.4 + idx * 0.05);
+                    });
+                }
+            } catch (e) {
+                console.log('Audio error:', e);
+            }
+        }
+
+        /* ==========================================================================
+           2. DATA MASTER POOL & STATE CONFIGURATION
+           ========================================================================== */
+        
+        // Initial start date definition
+        const TODAY_DATE_STR = new Date().toISOString().split('T')[0];
+        
+        // Master Pool of Daily Tasks
+        const TASK_POOL = [
+            {
+                id: 'task_寸止',
+                name: '【控压控制】每日边缘寸止练习',
+                desc: '自行或配合道具进行 3 次边缘寸止控制，每次临界保持 45 秒。',
+                reward: '允许今晚申请 5 分钟贴贴',
+                penalty: '追加打屁股 30 下',
+                penaltyType: '打屁股(下)',
+                penaltyAmount: 30
+            },
+            {
+                id: 'task_姿态',
+                name: '【姿态规范】严禁腿部交叉与自慰',
+                desc: '全天保持端正坐姿，双腿并拢，未经许可严禁触碰敏感区域。',
+                reward: '获得“服从淑女”日志记录',
+                penalty: '罚跪复盘 20 分钟',
+                penaltyType: '罚跪(分钟)',
+                penaltyAmount: 20
+            },
+            {
+                id: 'task_跳蛋',
+                name: '【道具放置】指定跳蛋低频佩戴',
+                desc: '在日常学习/工作期间佩戴跳蛋 1.5 小时，保持情绪平稳。',
+                reward: '累计解锁自由道具控制时长',
+                penalty: '追加抽穴 30 下',
+                penaltyType: '抽穴(下)',
+                penaltyAmount: 30
+            },
+            {
+                id: 'task_汇报',
+                name: '【定时汇报】每2小时姿态与位置打卡',
+                desc: '白日按时向Dom发送简短文字或姿态照汇报当前状态。',
+                reward: 'Dom的头发揉揉与夸奖',
+                penalty: '打手心 15 下',
+                penaltyType: '打手心(下)',
+                penaltyAmount: 15
+            },
+            {
+                id: 'task_罚跪复盘',
+                name: '【晚间复盘】15分钟跪姿自我检讨',
+                desc: '睡前于软垫跪姿 15 分钟，复盘今日行为与臣服心态。',
+                reward: '心里获得极高安全感与平静',
+                penalty: '当日禁止高潮 1 天',
+                penaltyType: '禁止高潮(天)',
+                penaltyAmount: 1
+            },
+            {
+                id: 'task_学习',
+                name: '【专注规矩】每日1.5小时学习研读',
+                desc: '无杂念高效完成当日学习目标，期间不得偷懒或分心。',
+                reward: '可向Dom讨要晚安语音',
+                penalty: '追加罚站 30 分钟',
+                penaltyType: '罚站(分钟)',
+                penaltyAmount: 30
+            },
+            {
+                id: 'task_镜前姿态',
+                name: '【臣服意识】镜前裸体姿势与眼神训导',
+                desc: '于镜前维持跪姿 10 分钟，保持眼神专注臣服，不允许躲闪。',
+                reward: '获得主人的温柔摸头',
+                penalty: '蹭桌角 40 下',
+                penaltyType: '蹭桌角(下)',
+                penaltyAmount: 40
+            },
+            {
+                id: 'task_耳光规矩',
+                name: '【言语谨慎】口条规矩与礼貌称呼',
+                desc: '全天对Dom使用规范敬语称呼，不得有任何任性或顶嘴顶撞。',
+                reward: '获得允许主导10分钟对话',
+                penalty: '轻轻戒尺抽耳光 6 下',
+                penaltyType: '耳光(下)',
+                penaltyAmount: 6
+            }
+        ];
+
+        // Directives Pool
+        const DIRECTIVES = [
+            '"今天也要做个 Good girl。"',
+            '"规矩在心，随时保持对主人的敬畏。"',
+            '"乖乖听话，今晚会有奖励你的时刻。"',
+            '"允许你的娇嗔，但绝不允许任何违规。"',
+            '"将注意力放在自身成长与臣服上。"'
+        ];
+
+        // Bottom Remarks Pool
+        const REMARKS = [
+            "“规矩不是束缚，而是让你安心依附我的缰绳。今晚期待你的检讨。”",
+            "“你的每一次听话与克制，都会变成你身上最迷人的痕迹。”",
+            "“如果有未完成的任务，自己乖乖去惩罚队列里等待，别让我亲自动手。”",
+            "“看到你的进步我很欣慰，但要时刻记住谁才是你的掌控者。”",
+            "“今天表现得好，晚上可以让你在我怀里多睡一会儿。”"
+        ];
+
+        // Achievement Wall Master Definitions
+        const ACHIEVEMENTS_DATA = [
+            {
+                id: 'ach_1',
+                title: '服从初体验',
+                desc: '首次连续3天全勤完成每日任务',
+                type: '服从类',
+                unlocked: true,
+                badge: '🏅'
+            },
+            {
+                id: 'ach_2',
+                title: '极界耐力控',
+                desc: '单次边缘控压(寸止)时长达60分钟',
+                type: '耐力类',
+                unlocked: true,
+                badge: '🏅'
+            },
+            {
+                id: 'ach_3',
+                title: '惩罚清算者',
+                desc: '累计结算SP(打屁股)超过100下',
+                type: '技巧类',
+                unlocked: false,
+                hint: '技巧类：打屁股达到指定数量解锁',
+                badge: '🔒'
+            },
+            {
+                id: 'ach_4',
+                title: '羞耻忍耐达人',
+                desc: '佩戴指定道具在公共/工作场所满3小时',
+                type: '羞耻类',
+                unlocked: false,
+                hint: '羞耻类：抽穴或道具放置达成指定记录',
+                badge: '🔒'
+            },
+            {
+                id: 'ach_5',
+                title: '完美的乖狗狗',
+                desc: '连续14天未触发任何未完成惩罚',
+                type: '服从类',
+                unlocked: false,
+                hint: '服从类：连续X天完美无违规',
+                badge: '🔒'
+            },
+            {
+                id: 'ach_6',
+                title: '??? 隐藏成就',
+                desc: '触发主人特殊隐藏惩罚并清算',
+                type: '隐藏类',
+                unlocked: false,
+                hint: '🔒 隐藏成就：条件未知',
+                badge: '🔒'
+            }
+        ];
+
+        /* ==========================================================================
+           3. APPLICATION STATE MANAGEMENT & PERSISTENCE
+           ========================================================================== */
+        
+        let currentDateStr = TODAY_DATE_STR;
+        
+        // Initial state load or creation
+        let appState = loadDataFromStorage() || {
+            initialDate: TODAY_DATE_STR,
+            cumulativePenaltyStats: {
+                '打屁股(下)': 0,
+                '罚跪(分钟)': 0,
+                '寸止(次)': 0,
+                '打手心(下)': 0,
+                '禁止高潮(天)': 0,
+                '抽穴(下)': 0,
+                '罚站(分钟)': 0,
+                '蹭桌角(下)': 0,
+                '耳光(下)': 0
+            },
+            dateData: {} // keyed by 'YYYY-MM-DD'
+        };
+
+        function saveState() {
+            try {
+                localStorage.setItem('DOM_QUEST_PANEL_STATE_v2', JSON.stringify(appState));
+            } catch (e) {
+                console.error("Storage save error", e);
+            }
+        }
+
+        function loadDataFromStorage() {
+            try {
+                const data = localStorage.getItem('DOM_QUEST_PANEL_STATE_v2');
+                return data ? JSON.parse(data) : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Deterministic PRNG based on string seed
+        function hashCode(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = (hash << 5) - hash + str.charCodeAt(i);
+                hash |= 0;
+            }
+            return Math.abs(hash);
+        }
+
+        function getOrCreateDateData(dateStr) {
+            if (appState.dateData[dateStr]) {
+                return appState.dateData[dateStr];
+            }
+
+            // Pseudo random seed for date
+            const seed = hashCode(dateStr);
+            
+            // Generate tasks (5 to 6 tasks selected from TASK_POOL)
+            const shuffled = [...TASK_POOL].sort((a, b) => {
+                return (hashCode(a.id + dateStr) % 100) - (hashCode(b.id + dateStr) % 100);
+            });
+            const selectedTasks = shuffled.slice(0, 6).map(t => ({
+                ...t,
+                completed: false
+            }));
+
+            // Grades list
+            const grades = ['S', 'A', 'B', 'A', 'S', 'C'];
+            const yesterdayGrade = (dateStr === appState.initialDate) ? '—' : grades[seed % grades.length];
+            
+            const directive = DIRECTIVES[seed % DIRECTIVES.length];
+            const remark = REMARKS[seed % REMARKS.length];
+
+            const newDateData = {
+                tasks: selectedTasks,
+                yesterdayGrade: yesterdayGrade,
+                directive: directive,
+                remark: remark,
+                challenge: {
+                    name: '边缘控压与跳蛋持续放置',
+                    desc: '在低频刺激下保持极界边缘状态，禁止自主高潮。',
+                    durationMinutes: 30,
+                    secondsLeft: 30 * 60,
+                    active: false,
+                    completed: false,
+                    startTimeStr: '14:00',
+                    endTimeStr: '14:30'
+                },
+                manualPenalties: [] // additional non-task penalties
+            };
+
+            appState.dateData[dateStr] = newDateData;
+            saveState();
+            return newDateData;
+        }
+
+        /* ==========================================================================
+           4. CHALLENGE TIMER CONTROLLER
+           ========================================================================== */
+        let challengeTimerInterval = null;
+
+        function startChallengeTimerLogic() {
+            if (challengeTimerInterval) clearInterval(challengeTimerInterval);
+            challengeTimerInterval = setInterval(() => {
+                const dateData = getOrCreateDateData(currentDateStr);
+                if (dateData.challenge.active && dateData.challenge.secondsLeft > 0) {
+                    dateData.challenge.secondsLeft--;
+                    renderTimedChallengeCard(dateData.challenge);
+                    if (dateData.challenge.secondsLeft === 0) {
+                        dateData.challenge.active = false;
+                        dateData.challenge.completed = true;
+                        playSound('challengeEnd');
+                        saveState();
+                        renderTimedChallengeCard(dateData.challenge);
+                    }
+                }
+            }, 1000);
+        }
+
+        function toggleChallengeTimer() {
+            playSound('click');
+            const dateData = getOrCreateDateData(currentDateStr);
+            if (dateData.challenge.completed) return;
+
+            dateData.challenge.active = !dateData.challenge.active;
+            saveState();
+            renderTimedChallengeCard(dateData.challenge);
+        }
+
+        function completeChallenge() {
+            playSound('challengeEnd');
+            const dateData = getOrCreateDateData(currentDateStr);
+            dateData.challenge.completed = true;
+            dateData.challenge.active = false;
+            dateData.challenge.secondsLeft = 0;
+            saveState();
+            renderTimedChallengeCard(dateData.challenge);
+        }
+
+        /* ==========================================================================
+           5. UI RENDER ENGINE
+           ========================================================================== */
+
+        function renderPanel() {
+            const dateData = getOrCreateDateData(currentDateStr);
+
+            // Update Header info
+            document.getElementById('dateInput').value = currentDateStr;
+            document.getElementById('domDirective').innerText = dateData.directive;
+            document.getElementById('domRemark').innerText = dateData.remark;
+
+            const gradeElem = document.getElementById('yesterdayGrade');
+            gradeElem.innerText = dateData.yesterdayGrade;
+            if (dateData.yesterdayGrade === 'S') gradeElem.className = 'text-xl font-black font-mono text-emerald-400 neon-text-green mt-0.5';
+            else if (dateData.yesterdayGrade === 'A') gradeElem.className = 'text-xl font-black font-mono text-cyan-400 neon-text-cyan mt-0.5';
+            else if (dateData.yesterdayGrade === 'B') gradeElem.className = 'text-xl font-black font-mono text-amber-400 neon-text-gold mt-0.5';
+            else if (dateData.yesterdayGrade === 'C' || dateData.yesterdayGrade === 'D') gradeElem.className = 'text-xl font-black font-mono text-rose-500 mt-0.5';
+            else gradeElem.className = 'text-xl font-black font-mono text-slate-500 mt-0.5';
+
+            // Render Tasks
+            renderTaskList(dateData.tasks);
+
+            // Render Timed Challenge
+            renderTimedChallengeCard(dateData.challenge);
+
+            // Render Penalty Queue
+            renderPenaltyQueueAndStats(dateData);
+
+            // Render Achievements
+            renderAchievements();
+
+            // Progress bar update
+            updateProgress(dateData.tasks);
+        }
+
+        function renderTaskList(tasks) {
+            const container = document.getElementById('questList');
+            container.innerHTML = '';
+
+            const completedCount = tasks.filter(t => t.completed).length;
+            document.getElementById('questCountBadge').innerText = `${completedCount}/${tasks.length} 已完成`;
+
+            tasks.forEach((task, index) => {
+                const card = document.createElement('div');
+                card.className = `p-3 rounded-lg border transition-all duration-300 flex items-start gap-2.5 ${
+                    task.completed 
+                        ? 'bg-emerald-950/20 border-emerald-900/40 text-slate-300' 
+                        : 'bg-slate-900/90 border-slate-800 text-slate-200 hover:border-slate-700'
+                }`;
+
+                card.innerHTML = `
+                    <div class="pt-0.5">
+                        <input type="checkbox" 
+                            ${task.completed ? 'checked' : ''} 
+                            onchange="toggleTaskStatus(${index})" 
+                            class="cyber-checkbox w-4 h-4">
+                    </div>
+                    <div class="flex-1 min-w-0 space-y-1">
+                        <div class="flex items-center justify-between gap-1">
+                            <h3 class="text-xs font-bold font-mono ${task.completed ? 'text-emerald-400 line-through opacity-80' : 'text-slate-100'}">
+                                ${task.name}
+                            </h3>
+                            <span class="text-[9px] font-mono px-1.5 py-0.2 rounded ${task.completed ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-slate-800 text-slate-400'}">
+                                ${task.completed ? '☑ 已完成' : '☐ 未完成'}
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 leading-tight">
+                            ${task.desc}
+                        </p>
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] pt-0.5">
+                            <span class="text-emerald-400 flex items-center gap-0.5">
+                                <span>🎁 奖励:</span> <span class="text-slate-300">${task.reward}</span>
+                            </span>
+                            ${!task.completed ? `
+                                <span class="text-rose-400 flex items-center gap-0.5">
+                                    <span>⚠️ 未完成受罚:</span> <span class="text-rose-300 font-semibold">${task.penalty}</span>
+                                </span>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function toggleTaskStatus(index) {
+            const dateData = getOrCreateDateData(currentDateStr);
+            const task = dateData.tasks[index];
+            task.completed = !task.completed;
+
+            playSound(task.completed ? 'check' : 'uncheck');
+            saveState();
+            renderPanel();
+        }
+
+        function renderTimedChallengeCard(challenge) {
+            const timerDisplay = document.getElementById('challengeTimer');
+            const startBtn = document.getElementById('startChallengeBtn');
+            const meter = document.getElementById('challengeMeter');
+
+            const m = Math.floor(challenge.secondsLeft / 60);
+            const s = challenge.secondsLeft % 60;
+            timerDisplay.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+            const totalSec = challenge.durationMinutes * 60;
+            const pct = Math.max(0, Math.min(100, (challenge.secondsLeft / totalSec) * 100));
+            meter.style.width = `${pct}%`;
+
+            if (challenge.completed) {
+                timerDisplay.innerText = "✓ 已解锁";
+                timerDisplay.className = "text-sm font-mono font-bold text-emerald-400 neon-text-green";
+                startBtn.className = "hidden";
+            } else if (challenge.active) {
+                startBtn.innerText = "⏸ 暂停挑战";
+                startBtn.className = "px-2.5 py-1 bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-700 text-[10px] font-mono font-bold rounded transition";
+            } else {
+                startBtn.innerText = "▶ 开始挑战";
+                startBtn.className = "px-2.5 py-1 bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-700 text-[10px] font-mono font-bold rounded transition";
+            }
+        }
+
+        /* ==========================================================================
+           6. PENALTY QUEUE & CYCLE STATUS CONTROLLER
+           ========================================================================== */
+
+        // Status cycle helper
+        // Statuses: ⏳等待执行 -> 🔴执行中 -> ✅已结算 -> ⏳等待执行
+        const STATUS_FLOW = ['⏳等待执行', '🔴执行中', '✅已结算'];
+
+        function renderPenaltyQueueAndStats(dateData) {
+            const queueContainer = document.getElementById('penaltyQueueList');
+            queueContainer.innerHTML = '';
+
+            // Derive active penalties from UNCOMPLETED daily tasks
+            const activePenalties = [];
+
+            dateData.tasks.forEach(t => {
+                if (!t.completed) {
+                    // Task penalty item
+                    if (!t.penaltyStatus) t.penaltyStatus = '⏳等待执行';
+                    activePenalties.push({
+                        id: t.id,
+                        title: t.name.replace(/【.*?】/, ''),
+                        detail: t.penalty,
+                        type: t.penaltyType,
+                        amount: t.penaltyAmount,
+                        status: t.penaltyStatus,
+                        source: 'task',
+                        taskRef: t
+                    });
+                }
+            });
+
+            // Include any manual extra penalties added for this day
+            (dateData.manualPenalties || []).forEach(m => {
+                activePenalties.push(m);
+            });
+
+            if (activePenalties.length === 0) {
+                queueContainer.innerHTML = `
+                    <div class="p-3 bg-slate-950 border border-slate-800/80 rounded-lg text-center text-xs font-mono text-slate-500 italic">
+                        —— 当前无待清算事项 ——
+                    </div>
+                `;
+            } else {
+                activePenalties.forEach((pen, idx) => {
+                    const card = document.createElement('div');
+                    let statusBg = 'bg-amber-950/40 text-amber-300 border-amber-800/60';
+                    if (pen.status === '🔴执行中') statusBg = 'bg-rose-950/60 text-rose-300 border-rose-700 animate-pulse';
+                    if (pen.status === '✅已结算') statusBg = 'bg-emerald-950/60 text-emerald-300 border-emerald-800 opacity-75';
+
+                    card.className = `p-2.5 rounded-lg border bg-slate-900/90 border-slate-800 flex items-center justify-between gap-2 transition`;
+                    card.innerHTML = `
+                        <div class="space-y-0.5">
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-rose-400 text-xs font-bold">⚠️ ${pen.detail}</span>
+                            </div>
+                            <div class="text-[10px] font-mono text-slate-400">
+                                来源: ${pen.title}
+                            </div>
+                        </div>
+                        <button onclick="cyclePenaltyStatus(${idx})" 
+                            class="text-[10px] font-mono px-2 py-1 rounded border font-semibold transition cursor-pointer flex-shrink-0 ${statusBg}">
+                            ${pen.status}
+                        </button>
+                    `;
+                    queueContainer.appendChild(card);
+                });
+            }
+
+            // Render Cumulative Breakdown Statistics
+            renderCumulativeStatsBreakdown();
+        }
+
+        function cyclePenaltyStatus(penaltyIdx) {
+            playSound('statusCycle');
+            const dateData = getOrCreateDateData(currentDateStr);
+            
+            // Build current list to reference index
+            const currentPenalties = [];
+            dateData.tasks.forEach(t => {
+                if (!t.completed) {
+                    if (!t.penaltyStatus) t.penaltyStatus = '⏳等待执行';
+                    currentPenalties.push({ type: 'task', ref: t });
+                }
+            });
+            (dateData.manualPenalties || []).forEach((m, idx) => {
+                currentPenalties.push({ type: 'manual', ref: m, idx: idx });
+            });
+
+            const target = currentPenalties[penaltyIdx];
+            if (!target) return;
+
+            let currStatus = target.type === 'task' ? target.ref.penaltyStatus : target.ref.status;
+            let nextIndex = (STATUS_FLOW.indexOf(currStatus) + 1) % STATUS_FLOW.length;
+            let nextStatus = STATUS_FLOW[nextIndex];
+
+            // If transitioning to ✅已结算, add to cumulative stats!
+            if (nextStatus === '✅已结算' && currStatus !== '✅已结算') {
+                const pType = target.ref.penaltyType || '打屁股(下)';
+                const pAmt = target.ref.penaltyAmount || 10;
+                if (!appState.cumulativePenaltyStats[pType]) {
+                    appState.cumulativePenaltyStats[pType] = 0;
+                }
+                appState.cumulativePenaltyStats[pType] += pAmt;
+            }
+            // If transitioning away from ✅已结算 back to ⏳, subtract back!
+            else if (currStatus === '✅已结算' && nextStatus !== '✅已结算') {
+                const pType = target.ref.penaltyType || '打屁股(下)';
+                const pAmt = target.ref.penaltyAmount || 10;
+                if (appState.cumulativePenaltyStats[pType]) {
+                    appState.cumulativePenaltyStats[pType] = Math.max(0, appState.cumulativePenaltyStats[pType] - pAmt);
+                }
+            }
+
+            if (target.type === 'task') {
+                target.ref.penaltyStatus = nextStatus;
+            } else {
+                target.ref.status = nextStatus;
+            }
+
+            saveState();
+            renderPanel();
+        }
+
+        function renderCumulativeStatsBreakdown() {
+            const container = document.getElementById('penaltyStatsBreakdown');
+            container.innerHTML = '';
+
+            const stats = appState.cumulativePenaltyStats || {};
+            const keys = Object.keys(stats);
+            let totalSettledSum = 0;
+
+            keys.forEach(k => {
+                const val = stats[k] || 0;
+                if (val > 0) totalSettledSum++;
+
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-slate-900 px-2 py-1 rounded border border-slate-800/80";
+                div.innerHTML = `
+                    <span class="text-slate-400">${k}:</span>
+                    <span class="font-bold text-rose-300">${val}</span>
+                `;
+                container.appendChild(div);
+            });
+
+            document.getElementById('totalPenaltyCount').innerText = `${totalSettledSum} 项有结算记录`;
+        }
+
+        /* ==========================================================================
+           7. ACHIEVEMENTS RENDERER
+           ========================================================================== */
+        function renderAchievements() {
+            const container = document.getElementById('achievementGrid');
+            container.innerHTML = '';
+
+            let unlockedCount = 0;
+
+            ACHIEVEMENTS_DATA.forEach(ach => {
+                if (ach.unlocked) unlockedCount++;
+
+                const card = document.createElement('div');
+                card.className = `p-2 rounded-lg border flex items-center gap-2 transition ${
+                    ach.unlocked 
+                        ? 'bg-amber-950/20 gold-border-glow text-amber-200' 
+                        : 'bg-slate-900/60 border-slate-800 text-slate-500'
+                }`;
+
+                card.innerHTML = `
+                    <div class="text-lg ${ach.unlocked ? 'neon-text-gold' : 'opacity-40'}">${ach.badge}</div>
+                    <div class="min-w-0 space-y-0.5">
+                        <div class="text-[11px] font-bold font-mono ${ach.unlocked ? 'text-amber-300' : 'text-slate-400'}">
+                            ${ach.unlocked ? ach.title : (ach.hint || '🔒 未解锁成就')}
+                        </div>
+                        <div class="text-[9px] ${ach.unlocked ? 'text-slate-300' : 'masked-text'}">
+                            ${ach.desc}
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            document.getElementById('achievementProgressText').innerText = `${unlockedCount}/${ACHIEVEMENTS_DATA.length} 已解锁`;
+        }
+
+        function updateProgress(tasks) {
+            const total = tasks.length;
+            const completed = tasks.filter(t => t.completed).length;
+            const pct = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+            document.getElementById('progressBar').style.width = `${pct}%`;
+            document.getElementById('progressPercent').innerText = `${pct}% (${completed}/${total})`;
+        }
+
+        /* ==========================================================================
+           8. DATE SWITCHER & CONTROLLER ACTIONS
+           ========================================================================== */
+        
+        function onDateInputChange(newDateStr) {
+            if (!newDateStr) return;
+            playSound('click');
+            currentDateStr = newDateStr;
+            renderPanel();
+        }
+
+        function changeDate(offsetDays) {
+            playSound('click');
+            const d = new Date(currentDateStr);
+            d.setDate(d.getDate() + offsetDays);
+            currentDateStr = d.toISOString().split('T')[0];
+            renderPanel();
+        }
+
+        function resetTodayPanel() {
+            playSound('click');
+            // Re-shuffle today's panel
+            delete appState.dateData[currentDateStr];
+            saveState();
+            renderPanel();
+        }
+
+        /* ==========================================================================
+           9. SYSTEM INITIALIZATION
+           ========================================================================== */
+        window.onload = function() {
+            currentDateStr = TODAY_DATE_STR;
+            getOrCreateDateData(currentDateStr);
+            renderPanel();
+            startChallengeTimerLogic();
+        };
+
+    </script>
 </body>
 </html>
